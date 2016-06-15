@@ -97,4 +97,13 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="title_activity_station_rank">StationRankActivity</string>
+    <string name="priceE5">E5\n%1$s</string>
+    <string name="priceE10">E10\n%1$s</string>
+    <string name="priceDiesel">Diesel\n%1$s</string>
+    <string name="opened">Geöffnet</string>
+    <string name="closed">Geschlossen</string>
+    <string name="address">%1$s %2$s %3$s %4$s</string>
+    <string name="stationRankTitle">%1$s %2$s</string>
+    <string name="distance">%1$skm</string>
 </resources>

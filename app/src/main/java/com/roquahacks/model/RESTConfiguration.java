@@ -40,7 +40,7 @@ public class RESTConfiguration {
 
     private static int MAX_RADIAN = 25;
     private static int MIN_RADIAN = 1;
-    public static String API_KEY = "xxxxx";
+    public static String API_KEY = "XXXX";
     public static String BASE_URL = "https://creativecommons.tankerkoenig.de/";
 
     public RESTConfiguration(FuelType fuelType, double lat, double lng, int radian, SortPolicy sortPolicy) {

@@ -1,6 +1,9 @@
 package com.roquahacks.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Objects;
@@ -8,7 +11,7 @@ import java.util.Objects;
 /**
  * Created by Studio on 04.06.2016.
  */
-public class Station {
+public class Station implements Parcelable, Comparable<Station> {
 
     private String name;
     private double lat;
@@ -28,9 +31,11 @@ public class Station {
     private int postCode;
     private String place;
 
-    public Station(String name, double lat, double lng, String brand, double dist,
-                   double priceE5, double priceE10, double priceDiesel, String id,
-                   boolean isOpen) {
+    private static SortPolicyStation sortPolicy;
+
+    public Station(String name, double lat, double lng, String brand, double dist, double priceE5,
+                   double priceE10, double priceDiesel, String id, boolean isOpen, String street,
+                   String houseNumber, int postCode, String place) {
         this.name = name;
         this.lat = lat;
         this.lng = lng;
@@ -41,6 +46,35 @@ public class Station {
         this.priceDiesel = priceDiesel;
         this.id = id;
         this.isOpen = isOpen;
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.postCode = postCode;
+        this.place = place;
+    }
+
+    public Station(Parcel parcel) {
+        this.name = parcel.readString();
+        this.lat = parcel.readDouble();
+        this.lng = parcel.readDouble();
+        this.brand = parcel.readString();
+        this.dist = parcel.readDouble();
+        this.priceE5 = parcel.readDouble();
+        this.priceE10 = parcel.readDouble();
+        this.priceDiesel = parcel.readDouble();
+        this.id = parcel.readString();
+        this.isOpen = Boolean.valueOf(parcel.readString());
+        this.street = parcel.readString();
+        this.houseNumber = parcel.readString();
+        this.postCode = parcel.readInt();
+        this.place = parcel.readString();
+    }
+
+    public static SortPolicyStation getSortPolicy() {
+        return sortPolicy;
+    }
+
+    public static void setSortPolicy(SortPolicyStation sortPolicy) {
+        Station.sortPolicy = sortPolicy;
     }
 
     public String getName() {
@@ -200,5 +234,66 @@ public class Station {
                 ", postcode=" + postCode +
                 ", place='" + place + '\'' +
                 '}';
+    }
+
+    public static final Parcelable.Creator<Station> CREATOR =
+            new Parcelable.Creator<Station>(){
+                @Override
+                public Station createFromParcel(Parcel source) {
+                    return new Station(source);
+                }
+
+                @Override
+                public Station[] newArray(int size) {
+                    return new Station[size];
+                }
+            };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(this.name);
+        parcel.writeDouble(this.lat);
+        parcel.writeDouble(this.lng);
+        parcel.writeString(this.brand);
+        parcel.writeDouble(this.dist);
+        parcel.writeDouble(this.priceE5);
+        parcel.writeDouble(this.priceE10);
+        parcel.writeDouble(this.priceDiesel);
+        parcel.writeString(this.id);
+        parcel.writeString(String.valueOf(this.isOpen));
+        parcel.writeString(this.street);
+        parcel.writeString(this.houseNumber);
+        parcel.writeInt(this.postCode);
+        parcel.writeString(this.place);
+    }
+
+    @Override
+    public int compareTo(Station station) {
+       if(Station.sortPolicy == SortPolicyStation.DISTANCE) {
+            return this.compareBySortPolicy(this.getDist(), station.getDist());
+       } else if(Station.sortPolicy == SortPolicyStation.PRICE_E5) {
+            return this.compareBySortPolicy(this.getPriceE5(), station.getPriceE5());
+       } else if(Station.sortPolicy == SortPolicyStation.PRICE_E10) {
+            return this.compareBySortPolicy(this.getPriceE10(), station.getPriceE10());
+       } else if(Station.sortPolicy == SortPolicyStation.PRICE_DIESEL) {
+            return this.compareBySortPolicy(this.getPriceDiesel(), station.getPriceDiesel());
+       }
+        return 0;
+    }
+
+    private int compareBySortPolicy(double thiz, double that) {
+        double dist =  that - thiz;
+        if(dist > 0) {
+            return -1;
+        } else if(dist < 0) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

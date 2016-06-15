@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.roquahacks.refuel">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -25,6 +25,10 @@
         <activity
             android:name=".FuelContextActivity"
             android:label="@string/title_activity_fuel_context"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".StationRankActivity"
+            android:label="@string/title_activity_station_rank"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

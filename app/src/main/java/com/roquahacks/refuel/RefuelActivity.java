@@ -46,6 +46,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import javax.net.ssl.SSLContext;
@@ -69,9 +70,11 @@ public class RefuelActivity extends AppCompatActivity
 
     private RESTConfiguration restConfig;
     private Button buttonCurrFuel;
-    private Button buttonBestTime;
+    Button buttonBestTime;
+    ArrayList<Station> mStations;
     private GoogleApiClient mGoogleApiClient;
     private Subscription subscription;
+    public static String STATIONS = "stations";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -86,6 +89,12 @@ public class RefuelActivity extends AppCompatActivity
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                if(mStations != null) {
+                    Intent intent = new Intent(RefuelActivity.this, StationRankActivity.class);
+                    intent.putParcelableArrayListExtra(RefuelActivity.STATIONS, mStations);
+                    RefuelActivity.this.startActivity(intent);
+                }
+
             }
         });
 
@@ -120,7 +129,7 @@ public class RefuelActivity extends AppCompatActivity
 //        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         final double LAT = 49.488520;
         final double LNG = 8.462758;
-        final int RADIAN = 2;
+        final int RADIAN = 5;
         final RESTConfiguration.FuelType FUEL_TYPE = RESTConfiguration.FuelType.ALL;
         final RESTConfiguration.SortPolicy SORT_POLICY = RESTConfiguration.SortPolicy.DISTANCE;
         RESTConfiguration restConfig = new RESTConfiguration()
@@ -145,12 +154,12 @@ public class RefuelActivity extends AppCompatActivity
                 .subscribe(new Subscriber<RESTStatus>() {
                     @Override
                     public void onCompleted() {
-                        
+                        Log.d("Refuel", "Completed");
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.d("Refuel", "Error during REST call");
                     }
 
                     @Override
@@ -160,10 +169,19 @@ public class RefuelActivity extends AppCompatActivity
                             Log.d("Refuel", s.toString());
 
                         }
+                        mStations = toArrayList(stations);
                     }
                 });
 
 
+    }
+
+    public <T> ArrayList<T> toArrayList(List<T> list) {
+        ArrayList<T> convertedList = new ArrayList<>();
+        for(T t : list) {
+            convertedList.add(t);
+        }
+        return convertedList;
     }
 
 
