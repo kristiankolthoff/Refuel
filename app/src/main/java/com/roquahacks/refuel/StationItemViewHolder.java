@@ -2,6 +2,7 @@ package com.roquahacks.refuel;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -16,6 +17,7 @@ public class StationItemViewHolder extends RecyclerView.ViewHolder{
     private TextView textView_priceE5;
     private TextView textView_priceE10;
     private TextView textView_priceDiesel;
+    private ImageView imageView_logo;
 
     public StationItemViewHolder(View itemView) {
         super(itemView);
@@ -26,6 +28,7 @@ public class StationItemViewHolder extends RecyclerView.ViewHolder{
         this.textView_priceE5 = (TextView) itemView.findViewById(R.id.textView_PriceE5);
         this.textView_priceE10 = (TextView) itemView.findViewById(R.id.textView_priceE10);
         this.textView_priceDiesel = (TextView) itemView.findViewById(R.id.textView_priceDiesel);
+        this.imageView_logo = (ImageView) itemView.findViewById(R.id.imageView_logo);
     }
 
     public TextView getTextView_title() {
@@ -82,5 +85,13 @@ public class StationItemViewHolder extends RecyclerView.ViewHolder{
 
     public void setTextView_priceDiesel(TextView textView_priceDiesel) {
         this.textView_priceDiesel = textView_priceDiesel;
+    }
+
+    public ImageView getImageView_logo() {
+        return imageView_logo;
+    }
+
+    public void setImageView_logo(ImageView imageView_logo) {
+        this.imageView_logo = imageView_logo;
     }
 }

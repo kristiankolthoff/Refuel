@@ -127,52 +127,8 @@ public class RefuelActivity extends AppCompatActivity
                     .build();
         }
 //        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        final double LAT = 49.488520;
-        final double LNG = 8.462758;
-        final int RADIAN = 5;
-        final RESTConfiguration.FuelType FUEL_TYPE = RESTConfiguration.FuelType.ALL;
-        final RESTConfiguration.SortPolicy SORT_POLICY = RESTConfiguration.SortPolicy.DISTANCE;
-        RESTConfiguration restConfig = new RESTConfiguration()
-                .setLat(LAT)
-                .setLng(LNG)
-                .setRadian(RADIAN)
-                .setFuelType(FUEL_TYPE)
-                .setSortPolicy(SORT_POLICY);
-        RESTFuelService fuelService = null;
-        try {
-            fuelService = new RESTFuelService.Factory()
-                    .setCaInput(getAssets().open("tanker-cert.cer"))
-                    .build();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        subscription = fuelService.fetchListStations(restConfig.getLat(),
-                restConfig.getLng(), restConfig.getRadian(), restConfig.getSortPolicy(),
-                restConfig.getFuelType(), RESTConfiguration.API_KEY)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Subscriber<RESTStatus>() {
-                    @Override
-                    public void onCompleted() {
-                        Log.d("Refuel", "Completed");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d("Refuel", "Error during REST call");
-                    }
-
-                    @Override
-                    public void onNext(RESTStatus restStatus) {
-                        List<Station> stations = restStatus.getStations();
-                        for(Station s : stations) {
-                            Log.d("Refuel", s.toString());
-
-                        }
-                        mStations = toArrayList(stations);
-                    }
-                });
-
+//        final double LAT = 49.488520;
+//        final double LNG = 8.462758;
 
     }
 
@@ -258,9 +214,55 @@ public class RefuelActivity extends AppCompatActivity
     public void onConnected(@Nullable Bundle bundle) {
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
+        Log.d("Refuel", "onConnected");
         if (mLastLocation != null) {
-            Log.d("Refuel", String.valueOf(mLastLocation.getLatitude()));
-            Log.d("Refuel", String.valueOf(mLastLocation.getLongitude()));
+            double lat = mLastLocation.getLatitude();
+            double lng = mLastLocation.getLongitude();
+            Log.d("Refuel", String.valueOf(lat));
+            Log.d("Refuel", String.valueOf(lng));
+            final int RADIAN = 5;
+            final RESTConfiguration.FuelType FUEL_TYPE = RESTConfiguration.FuelType.ALL;
+            final RESTConfiguration.SortPolicy SORT_POLICY = RESTConfiguration.SortPolicy.DISTANCE;
+            RESTConfiguration restConfig = new RESTConfiguration()
+                    .setLat(lat)
+                    .setLng(lng)
+                    .setRadian(RADIAN)
+                    .setFuelType(FUEL_TYPE)
+                    .setSortPolicy(SORT_POLICY);
+            RESTFuelService fuelService = null;
+            try {
+                fuelService = new RESTFuelService.Factory()
+                        .setCaInput(getAssets().open("tanker-cert.cer"))
+                        .build();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            subscription = fuelService.fetchListStations(restConfig.getLat(),
+                    restConfig.getLng(), restConfig.getRadian(), restConfig.getSortPolicy(),
+                    restConfig.getFuelType(), RESTConfiguration.API_KEY)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(new Subscriber<RESTStatus>() {
+                        @Override
+                        public void onCompleted() {
+                            Log.d("Refuel", "Completed");
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.d("Refuel", "Error during REST call");
+                        }
+
+                        @Override
+                        public void onNext(RESTStatus restStatus) {
+                            List<Station> stations = restStatus.getStations();
+                            for(Station s : stations) {
+                                Log.d("Refuel", s.toString());
+
+                            }
+                            mStations = toArrayList(stations);
+                        }
+                    });
         }
     }
 

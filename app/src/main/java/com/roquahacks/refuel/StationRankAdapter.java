@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.roquahacks.model.Station;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -44,6 +45,10 @@ public class StationRankAdapter extends RecyclerView.Adapter<StationItemViewHold
             holder.getTextView_isOpen().setText(this.context.getText(R.string.closed));
             holder.getTextView_isOpen().setTextColor(ContextCompat.getColor(this.context, R.color.closed));
         }
+//        Picasso.with(this.context)
+//                .load(R.drawable.aral)
+//                .into(holder.getImageView_logo());
+        holder.getImageView_logo().setImageDrawable(this.context.getDrawable(R.drawable.aral));
         holder.getTextView_address().setText(String.format(String.valueOf(this.context.getText(R.string.address)), s.getName(), s.getStreet(), s.getHouseNumber(), s.getPostCode()));
         holder.getTextView_priceE5().setText(String.format(String.valueOf(this.context.getText(R.string.priceE5)), s.getPriceE5()));
         holder.getTextView_priceE10().setText(String.format(String.valueOf(this.context.getText(R.string.priceE10)), s.getPriceE10()));
