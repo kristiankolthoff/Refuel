@@ -1,13 +1,8 @@
-package com.roquahacks.refuel;
+package com.roquahacks.refuel.activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -29,37 +24,14 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.roquahacks.model.RESTStatus;
 import com.roquahacks.model.Station;
-import com.roquahacks.model.RESTConfiguration;
+import com.roquahacks.service.RESTConfiguration;
+import com.roquahacks.refuel.R;
 import com.roquahacks.service.RESTFuelService;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-
-import butterknife.BindView;
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -82,6 +54,8 @@ public class RefuelActivity extends AppCompatActivity
         setContentView(R.layout.activity_refuel);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+//        this.overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +67,8 @@ public class RefuelActivity extends AppCompatActivity
                     Intent intent = new Intent(RefuelActivity.this, StationRankActivity.class);
                     intent.putParcelableArrayListExtra(RefuelActivity.STATIONS, mStations);
                     RefuelActivity.this.startActivity(intent);
+//                    Intent intent = new Intent(RefuelActivity.this, TestActivity.class);
+//                    RefuelActivity.this.startActivity(intent);
                 }
 
             }
@@ -265,6 +241,8 @@ public class RefuelActivity extends AppCompatActivity
                     });
         }
     }
+
+
 
     @Override
     public void onConnectionSuspended(int i) {

@@ -1,4 +1,4 @@
-package com.roquahacks.refuel;
+package com.roquahacks.refuel.view;
 
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.roquahacks.model.Station;
-import com.squareup.picasso.Picasso;
+import com.roquahacks.refuel.R;
 
 import java.util.List;
 

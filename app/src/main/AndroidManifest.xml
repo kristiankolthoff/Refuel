@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".RefuelActivity"
+            android:name=".activity.RefuelActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -23,13 +23,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FuelContextActivity"
+            android:name=".activity.FuelContextActivity"
             android:label="@string/title_activity_fuel_context"
             android:theme="@style/AppTheme.NoActionBar" />
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".activity.RefuelActivity" />
         <activity
-            android:name=".StationRankActivity"
+            android:name=".activity.StationRankActivity"
             android:label="@string/title_activity_station_rank"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.TestActivity"
+            android:label="@string/title_activity_test"
+            android:parentActivityName=".activity.RefuelActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.RefuelActivity" />
+        </activity>
     </application>
 
 </manifest>

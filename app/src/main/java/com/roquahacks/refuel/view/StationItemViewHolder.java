@@ -1,9 +1,11 @@
-package com.roquahacks.refuel;
+package com.roquahacks.refuel.view;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.roquahacks.refuel.R;
 
 /**
  * Created by Studio on 15.06.2016.

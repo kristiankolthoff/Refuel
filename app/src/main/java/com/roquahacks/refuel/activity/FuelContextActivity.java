@@ -1,4 +1,4 @@
-package com.roquahacks.refuel;
+package com.roquahacks.refuel.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+
+import com.roquahacks.refuel.R;
 
 public class FuelContextActivity extends AppCompatActivity {
 

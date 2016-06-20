@@ -1,4 +1,4 @@
-package com.roquahacks.model;
+package com.roquahacks.service;
 
 import android.content.res.AssetManager;
 import android.util.Log;
@@ -16,9 +16,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -40,7 +38,7 @@ public class RESTConfiguration {
 
     private static int MAX_RADIAN = 25;
     private static int MIN_RADIAN = 1;
-    public static String API_KEY = "XXXX";
+    public static String API_KEY = "xxxx";
     public static String BASE_URL = "https://creativecommons.tankerkoenig.de/";
 
     public RESTConfiguration(FuelType fuelType, double lat, double lng, int radian, SortPolicy sortPolicy) {

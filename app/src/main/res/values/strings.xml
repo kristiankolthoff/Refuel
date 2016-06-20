@@ -2,7 +2,7 @@
     <string name="app_name">Refuel</string>
     <string name="curr_fuel">Aktueller Spritpreis</string>
     <string name="best_time">Beste Tankzeit</string>
-    
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -106,4 +106,5 @@
     <string name="address">%1$s %2$s %3$s %4$s</string>
     <string name="stationRankTitle">%1$s %2$s</string>
     <string name="distance">%1$skm</string>
+    <string name="title_activity_test">TestActivity</string>
 </resources>
