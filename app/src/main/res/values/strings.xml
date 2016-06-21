@@ -2,7 +2,6 @@
     <string name="app_name">Refuel</string>
     <string name="curr_fuel">Aktueller Spritpreis</string>
     <string name="best_time">Beste Tankzeit</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -101,10 +100,16 @@
     <string name="priceE5">E5\n%1$s</string>
     <string name="priceE10">E10\n%1$s</string>
     <string name="priceDiesel">Diesel\n%1$s</string>
-    <string name="opened">Geöffnet</string>
-    <string name="closed">Geschlossen</string>
+    <string name="opened">\u2022 Geöffnet</string>
+    <string name="closed">\u2022 Geschlossen</string>
     <string name="address">%1$s %2$s %3$s %4$s</string>
     <string name="stationRankTitle">%1$s %2$s</string>
     <string name="distance">%1$skm</string>
     <string name="title_activity_test">TestActivity</string>
+    <string name="station_name">%1$s %2$s \u2022</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_station_list_actitvity">StationListActitvity</string>
+    <string name="title_activity_station_detail">StationDetailActivity</string>
 </resources>

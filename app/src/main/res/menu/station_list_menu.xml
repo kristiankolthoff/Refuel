@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".activity.StationListActivity">
+
+    <item
+        android:id="@+id/toggle_gridlist"
+        android:icon="@drawable/ic_action_grid"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:title=""/>
+
+</menu>

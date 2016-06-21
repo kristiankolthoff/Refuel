@@ -2,7 +2,7 @@ package com.roquahacks.refuel;
 
 import android.content.res.AssetManager;
 
-import com.roquahacks.service.RESTConfiguration;
+import com.roquahacks.model.RESTConfiguration;
 import com.roquahacks.service.RESTFuelService;
 
 import org.junit.Before;

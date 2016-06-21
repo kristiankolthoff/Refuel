@@ -24,7 +24,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.roquahacks.model.RESTStatus;
 import com.roquahacks.model.Station;
-import com.roquahacks.service.RESTConfiguration;
+import com.roquahacks.model.RESTConfiguration;
 import com.roquahacks.refuel.R;
 import com.roquahacks.service.RESTFuelService;
 
@@ -46,7 +46,9 @@ public class RefuelActivity extends AppCompatActivity
     ArrayList<Station> mStations;
     private GoogleApiClient mGoogleApiClient;
     private Subscription subscription;
+
     public static String STATIONS = "stations";
+    public static String STATION = "station";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -64,7 +66,7 @@ public class RefuelActivity extends AppCompatActivity
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                 if(mStations != null) {
-                    Intent intent = new Intent(RefuelActivity.this, StationRankActivity.class);
+                    Intent intent = new Intent(RefuelActivity.this, StationListActivity.class);
                     intent.putParcelableArrayListExtra(RefuelActivity.STATIONS, mStations);
                     RefuelActivity.this.startActivity(intent);
 //                    Intent intent = new Intent(RefuelActivity.this, TestActivity.class);
@@ -83,15 +85,6 @@ public class RefuelActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        this.buttonCurrFuel = (Button) findViewById(R.id.button_curr_fuel);
-        this.buttonCurrFuel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(RefuelActivity.this, FuelContextActivity.class);
-                RefuelActivity.this.startActivity(intent);
-            }
-        });
-        this.buttonBestTime = (Button) findViewById(R.id.button_best_time);
 
 
 
@@ -232,9 +225,9 @@ public class RefuelActivity extends AppCompatActivity
                         @Override
                         public void onNext(RESTStatus restStatus) {
                             List<Station> stations = restStatus.getStations();
-                            for(Station s : stations) {
-                                Log.d("Refuel", s.toString());
-
+                            for (int i = 0; i < stations.size(); i++) {
+                                stations.get(i).setRank(i+1);
+                                Log.d("Refuel", stations.get(i).toString());
                             }
                             mStations = toArrayList(stations);
                         }

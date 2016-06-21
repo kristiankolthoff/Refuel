@@ -1,28 +1,47 @@
 package com.roquahacks.refuel.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.roquahacks.model.Station;
 import com.roquahacks.refuel.R;
+import com.roquahacks.utils.LogoHolder;
+import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
 /**
  * Created by Studio on 15.06.2016.
  */
-public class StationRankAdapter extends RecyclerView.Adapter<StationItemViewHolder>{
+public class StationRankAdapter extends RecyclerView.Adapter<StationRankAdapter.StationItemViewHolder>{
 
-    private List<Station> stations;
-    private Context context;
+    private List<Station> mStations;
+    private Context mContext;
+    private OnItemClickListener mItemClickListener;
 
     public StationRankAdapter(List<Station> stations, Context context) {
-        this.stations = stations;
-        this.context = context;
+        this.mStations = stations;
+        this.mContext = context;
     }
 
     @Override
@@ -33,31 +52,67 @@ public class StationRankAdapter extends RecyclerView.Adapter<StationItemViewHold
     }
 
     @Override
-    public void onBindViewHolder(StationItemViewHolder holder, int position) {
-        Station s = this.stations.get(position);
-        holder.getTextView_title().setText(String.format(String.valueOf(this.context.getText(R.string.stationRankTitle)), (position + 1), s.getBrand()));
-        holder.getTextView_distance().setText(String.format(String.valueOf(this.context.getText(R.string.distance)), s.getDist()));
-        //TODO manage hard coded strings properly
-        if(s.isOpen()) {
-            holder.getTextView_isOpen().setText(this.context.getText(R.string.opened));
-            holder.getTextView_isOpen().setTextColor(ContextCompat.getColor(this.context, R.color.opened));
-        } else {
-            holder.getTextView_isOpen().setText(this.context.getText(R.string.closed));
-            holder.getTextView_isOpen().setTextColor(ContextCompat.getColor(this.context, R.color.closed));
-        }
-//        Picasso.with(this.context)
-//                .load(R.drawable.aral)
-//                .into(holder.getImageView_logo());
-        holder.getImageView_logo().setImageDrawable(this.context.getDrawable(R.drawable.aral));
-        holder.getTextView_address().setText(String.format(String.valueOf(this.context.getText(R.string.address)), s.getName(), s.getStreet(), s.getHouseNumber(), s.getPostCode()));
-        holder.getTextView_priceE5().setText(String.format(String.valueOf(this.context.getText(R.string.priceE5)), s.getPriceE5()));
-        holder.getTextView_priceE10().setText(String.format(String.valueOf(this.context.getText(R.string.priceE10)), s.getPriceE10()));
-        holder.getTextView_priceDiesel().setText(String.format(String.valueOf(this.context.getText(R.string.priceDiesel)), s.getPriceDiesel()));
+    public void onBindViewHolder(final StationItemViewHolder holder, int position) {
+        final Station s = mStations.get(position);
+        final SpannableStringBuilder str = new SpannableStringBuilder(String.format(mContext.getString(R.string.station_name),
+                s.getRank(), s.getBrand()));
+        str.setSpan(new StyleSpan(Typeface.BOLD), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        holder.textViewBrand.setText(str);
+        holder.textViewDistance.setText(String.format(mContext.getString(R.string.distance), s.getDist()));
+        final int backgroundID = s.getBackgroundID();
+        Picasso.with(mContext)
+                .load(backgroundID)
+                .into(holder.imageViewBackground);
+
+//        Bitmap backgroundImage = BitmapFactory.decodeResource(mContext.getResources(), backgroundID);
+//        Palette.generateAsync(backgroundImage, new Palette.PaletteAsyncListener() {
+//            @Override
+//            public void onGenerated(Palette palette) {
+//                int bgColor = palette.getLightVibrantColor(mContext.getResources().getColor(android.R.color.black));
+//                holder.placeNameHolder.setBackgroundColor(bgColor);
+//            }
+//        });
     }
 
     @Override
     public int getItemCount() {
-        return stations.size();
+        return mStations.size();
     }
+
+    public class StationItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+        public LinearLayout placeHolder;
+        public LinearLayout placeNameHolder;
+        public TextView textViewBrand;
+        public TextView textViewDistance;
+        public ImageView imageViewBackground;
+
+        public StationItemViewHolder(View itemView) {
+            super(itemView);
+            this.placeHolder = (LinearLayout) itemView.findViewById(R.id.mainHolder);
+            this.placeNameHolder = (LinearLayout) itemView.findViewById(R.id.placeNameHolder);
+            this.textViewBrand = (TextView) itemView.findViewById(R.id.textView_brand);
+            this.textViewDistance = (TextView) itemView.findViewById(R.id.textView_distance);
+            this.imageViewBackground = (ImageView) itemView.findViewById(R.id.imageView_background);
+            this.placeHolder.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(mItemClickListener != null) {
+                Toast.makeText(mContext, "Position", Toast.LENGTH_SHORT);
+                mItemClickListener.onItemClick(itemView, mStations.get(getAdapterPosition()));
+            }
+        }
+    }
+
+    public interface OnItemClickListener {
+        public void onItemClick(View view, Station station);
+    }
+
+    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
+        this.mItemClickListener = mItemClickListener;
+    }
+
 }
 

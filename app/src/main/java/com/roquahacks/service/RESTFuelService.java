@@ -1,5 +1,6 @@
 package com.roquahacks.service;
 
+import com.roquahacks.model.RESTConfiguration;
 import com.roquahacks.model.RESTStationDetail;
 import com.roquahacks.model.RESTStatus;
 

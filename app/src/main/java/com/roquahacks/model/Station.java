@@ -1,10 +1,13 @@
 package com.roquahacks.model;
 
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.roquahacks.utils.LogoHolder;
 
 import java.util.Objects;
 
@@ -30,8 +33,14 @@ public class Station implements Parcelable, Comparable<Station> {
     private String houseNumber;
     private int postCode;
     private String place;
-
     private static SortPolicyStation sortPolicy;
+
+    private transient Drawable logo;
+    private transient int logoID;
+    private transient int backgroundID;
+    private transient int rank;
+
+    private static String MISSING_NAME_PLACEHOLDER = "-";
 
     public Station(String name, double lat, double lng, String brand, double dist, double priceE5,
                    double priceE10, double priceDiesel, String id, boolean isOpen, String street,
@@ -67,6 +76,9 @@ public class Station implements Parcelable, Comparable<Station> {
         this.houseNumber = parcel.readString();
         this.postCode = parcel.readInt();
         this.place = parcel.readString();
+        this.backgroundID = parcel.readInt();
+        this.logoID = parcel.readInt();
+        this.rank = parcel.readInt();
     }
 
     public static SortPolicyStation getSortPolicy() {
@@ -78,7 +90,18 @@ public class Station implements Parcelable, Comparable<Station> {
     }
 
     public String getName() {
+        if(name == null) {
+            return MISSING_NAME_PLACEHOLDER;
+        }
         return name;
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     public void setName(String name) {
@@ -102,6 +125,9 @@ public class Station implements Parcelable, Comparable<Station> {
     }
 
     public String getBrand() {
+        if(brand == null) {
+            return name;
+        }
         return brand;
     }
 
@@ -190,6 +216,35 @@ public class Station implements Parcelable, Comparable<Station> {
         this.place = place;
     }
 
+    public Drawable getLogo(Context context) {
+        if(logo == null) {
+            logo = LogoHolder.getLogo(brand, context);
+        }
+        return logo;
+    }
+
+    public void setLogo(Drawable logo) {
+        this.logo = logo;
+    }
+
+    public int getLogoID() {
+        if(logoID == 0) {
+            logoID = LogoHolder.getLogoID(brand);
+        }
+        return logoID;
+    }
+
+    public void setLogoID(int logoID) {
+        this.logoID = logoID;
+    }
+
+    public int getBackgroundID() {
+        if(backgroundID == 0) {
+            backgroundID = LogoHolder.getStationBackgroundID(brand);
+        }
+        return backgroundID;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -270,6 +325,9 @@ public class Station implements Parcelable, Comparable<Station> {
         parcel.writeString(this.houseNumber);
         parcel.writeInt(this.postCode);
         parcel.writeString(this.place);
+        parcel.writeInt(this.backgroundID);
+        parcel.writeInt(this.logoID);
+        parcel.writeInt(this.rank);
     }
 
     @Override

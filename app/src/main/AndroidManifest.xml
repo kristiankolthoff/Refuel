@@ -22,25 +22,38 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.FuelContextActivity"
-            android:label="@string/title_activity_fuel_context"
-            android:theme="@style/AppTheme.NoActionBar" />
+
         <meta-data
             android:name="android.support.PARENT_ACTIVITY"
             android:value=".activity.RefuelActivity" />
+
         <activity
             android:name=".activity.StationRankActivity"
             android:label="@string/title_activity_station_rank"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activity.TestActivity"
-            android:label="@string/title_activity_test"
+            android:name=".activity.SplashActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_splash"
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".activity.StationListActivity"
+            android:label="@string/title_activity_station_list_actitvity"
             android:parentActivityName=".activity.RefuelActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.roquahacks.refuel.activity.RefuelActivity" />
+        </activity>
+        <activity
+            android:name=".activity.StationDetailActivity"
+            android:label="@string/title_activity_station_detail"
+            android:parentActivityName=".activity.StationListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.RefuelActivity" />
+                android:value="com.roquahacks.refuel.activity.StationListActivity" />
         </activity>
     </application>
 
