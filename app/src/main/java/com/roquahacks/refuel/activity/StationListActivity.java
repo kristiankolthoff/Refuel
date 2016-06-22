@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.roquahacks.model.Station;
+import com.roquahacks.refuel.Application;
 import com.roquahacks.refuel.R;
 import com.roquahacks.refuel.view.StationRankAdapter;
 
@@ -45,7 +46,7 @@ public class StationListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_station_list_actitvity);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
         getSupportActionBar().setElevation(7);
 
@@ -58,7 +59,7 @@ public class StationListActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        List<Station> stations = getIntent().getParcelableArrayListExtra(RefuelActivity.STATIONS);
+        List<Station> stations = getIntent().getParcelableArrayListExtra(Application.STATION_LIST_INTENT_ID);
 
         mRecyclerview = (RecyclerView) findViewById(R.id.recyclerview_station);
         mStaggeredLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
@@ -68,7 +69,7 @@ public class StationListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View view, Station station) {
                 Intent intent = new Intent(StationListActivity.this, StationDetailActivity.class);
-                intent.putExtra(RefuelActivity.STATION, station);
+                intent.putExtra(Application.STATION_INTENT_ID, station);
                 //Get corresponding views for transition
                 ImageView imageViewBackground = (ImageView) view.findViewById(R.id.imageView_background);
                 LinearLayout placeNameHolder = (LinearLayout) view.findViewById(R.id.placeNameHolder);

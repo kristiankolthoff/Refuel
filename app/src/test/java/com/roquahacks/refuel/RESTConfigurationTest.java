@@ -31,26 +31,6 @@ public class RESTConfigurationTest {
 
     @Before
     public void init() {
-        final double LAT = 49.488520;
-        final double LNG = 8.462758;
-        final int RADIAN = 1;
-        final RESTConfiguration.FuelType FUEL_TYPE = RESTConfiguration.FuelType.DIESEL;
-        final RESTConfiguration.SortPolicy SORT_POLICY = RESTConfiguration.SortPolicy.PRICE;
-        System.out.println(FUEL_TYPE.toString());
-        this.restConfig = new RESTConfiguration()
-                                .setLat(LAT)
-                                .setLng(LNG)
-                                .setRadian(RADIAN)
-                                .setFuelType(FUEL_TYPE)
-                                .setSortPolicy(SORT_POLICY);
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .sslSocketFactory(RESTConfiguration.getSSLSocketFactory(this.assetManager))
-                .build();
-        this.retrofit = new Retrofit.Builder()
-                .baseUrl(this.restConfig.BASE_URL)
-                .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
 
     }

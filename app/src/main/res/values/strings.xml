@@ -100,6 +100,9 @@
     <string name="priceE5">E5\n%1$s</string>
     <string name="priceE10">E10\n%1$s</string>
     <string name="priceDiesel">Diesel\n%1$s</string>
+    <string name="price_plain">%1$s €</string>
+    <string name="time">%1$s Uhr (%2$smin)</string>
+    <string name="price_change">%1$s\%</string>
     <string name="opened">\u2022 Geöffnet</string>
     <string name="closed">\u2022 Geschlossen</string>
     <string name="address">%1$s %2$s %3$s %4$s</string>
@@ -112,4 +115,10 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_station_list_actitvity">StationListActitvity</string>
     <string name="title_activity_station_detail">StationDetailActivity</string>
+    <string name="refuel_logo">refuel</string>
+    <string name="current_location">%1$s (%2$skm)</string>
+    <string name="navigation">Navigation</string>
+    <string name="ranking">Ranking</string>
+    <string name="refuel_now">Tanken</string>
 </resources>
+

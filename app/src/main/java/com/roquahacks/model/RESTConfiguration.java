@@ -78,6 +78,17 @@ public class RESTConfiguration {
         return fuelType;
     }
 
+    @Override
+    public String toString() {
+        return "RESTConfiguration{" +
+                "lat=" + lat +
+                ", lng=" + lng +
+                ", radian=" + radian +
+                ", sortPolicy=" + sortPolicy +
+                ", fuelType=" + fuelType +
+                '}';
+    }
+
     public static enum SortPolicy {
 
         PRICE ("price"),

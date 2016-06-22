@@ -63,7 +63,13 @@ public class StationRankAdapter extends RecyclerView.Adapter<StationRankAdapter.
         Picasso.with(mContext)
                 .load(backgroundID)
                 .into(holder.imageViewBackground);
-
+        if(s.isOpen()) {
+            holder.textViewOpenClosed.setTextColor(ContextCompat.getColor(mContext, R.color.opened));
+            holder.textViewOpenClosed.setText(mContext.getString(R.string.opened));
+        } else {
+            holder.textViewOpenClosed.setTextColor(ContextCompat.getColor(mContext, R.color.closed));
+            holder.textViewOpenClosed.setText(mContext.getString(R.string.closed));
+        }
 //        Bitmap backgroundImage = BitmapFactory.decodeResource(mContext.getResources(), backgroundID);
 //        Palette.generateAsync(backgroundImage, new Palette.PaletteAsyncListener() {
 //            @Override
@@ -85,7 +91,9 @@ public class StationRankAdapter extends RecyclerView.Adapter<StationRankAdapter.
         public LinearLayout placeNameHolder;
         public TextView textViewBrand;
         public TextView textViewDistance;
+        private TextView textViewOpenClosed;
         public ImageView imageViewBackground;
+        public ImageView imageViewLogo;
 
         public StationItemViewHolder(View itemView) {
             super(itemView);
@@ -93,7 +101,9 @@ public class StationRankAdapter extends RecyclerView.Adapter<StationRankAdapter.
             this.placeNameHolder = (LinearLayout) itemView.findViewById(R.id.placeNameHolder);
             this.textViewBrand = (TextView) itemView.findViewById(R.id.textView_brand);
             this.textViewDistance = (TextView) itemView.findViewById(R.id.textView_distance);
+            this.textViewOpenClosed = (TextView) itemView.findViewById(R.id.textView_open_closed);
             this.imageViewBackground = (ImageView) itemView.findViewById(R.id.imageView_background);
+            this.imageViewLogo = (ImageView) itemView.findViewById(R.id.imageView_logo);
             this.placeHolder.setOnClickListener(this);
         }
 

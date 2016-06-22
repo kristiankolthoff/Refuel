@@ -147,6 +147,15 @@ public class Station implements Parcelable, Comparable<Station> {
         return priceE5;
     }
 
+    public String getPriceE5Beautified() {
+        return this.beautifyPrice(priceE5);
+    }
+
+    private String beautifyPrice(double price) {
+        String priceString = String.valueOf(price).replace(".",",");
+        return priceString.substring(0,priceString.length()-1);
+    }
+
     public void setPriceE5(double priceE5) {
         this.priceE5 = priceE5;
     }
@@ -155,12 +164,20 @@ public class Station implements Parcelable, Comparable<Station> {
         return priceE10;
     }
 
+    public String getPriceE10Beautified() {
+        return this.beautifyPrice(priceE10);
+    }
+
     public void setPriceE10(double priceE10) {
         this.priceE10 = priceE10;
     }
 
     public double getPriceDiesel() {
         return priceDiesel;
+    }
+
+    public String getPriceDieselBeautified() {
+        return this.beautifyPrice(priceDiesel);
     }
 
     public void setPriceDiesel(double priceDiesel) {

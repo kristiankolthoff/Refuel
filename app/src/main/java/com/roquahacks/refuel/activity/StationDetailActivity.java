@@ -1,5 +1,6 @@
 package com.roquahacks.refuel.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -18,7 +19,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.MapFragment;
 import com.roquahacks.model.Station;
+import com.roquahacks.refuel.Application;
 import com.roquahacks.refuel.R;
 import com.squareup.picasso.Picasso;
 
@@ -31,6 +34,10 @@ public class StationDetailActivity extends AppCompatActivity {
     private TextView mTextViewBrand;
     private TextView mTextViewDistance;
     private TextView mTextViewOpenClosed;
+    private TextView mTextViewPriceE5;
+    private TextView mTextViewPriceE10;
+    private TextView mTextViewPriceDiesel;
+    private MapFragment mMapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,21 +52,16 @@ public class StationDetailActivity extends AppCompatActivity {
         getWindow().setExitTransition(fade);
         getWindow().setEnterTransition(fade);
 
-        mStation = getIntent().getParcelableExtra(RefuelActivity.STATION);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        mStation = getIntent().getParcelableExtra(Application.STATION_INTENT_ID);
 
         mImageViewBackground = (ImageView) findViewById(R.id.imageView_background_detail);
         mTextViewBrand = (TextView) findViewById(R.id.textView_brand_detail);
         mTextViewDistance = (TextView) findViewById(R.id.textView_distance_detail);
         mTextViewOpenClosed = (TextView) findViewById(R.id.textView_open_closed_detail);
+        mTextViewPriceE5 = (TextView) findViewById(R.id.textView_priceE5_detail);
+        mTextViewPriceE10 = (TextView) findViewById(R.id.textView_priceE10_detail);
+        mTextViewPriceDiesel = (TextView) findViewById(R.id.textView_priceDiesel_detail);
+
 
         Picasso.with(this)
                 .load(mStation.getBackgroundID())
@@ -76,6 +78,20 @@ public class StationDetailActivity extends AppCompatActivity {
             mTextViewOpenClosed.setTextColor(ContextCompat.getColor(this, R.color.closed));
             mTextViewOpenClosed.setText(this.getString(R.string.closed));
         }
+        final SpannableStringBuilder strE5 = new SpannableStringBuilder(String.format(this.getString(R.string.priceE5),
+                mStation.getPriceE5()));
+        strE5.setSpan(new StyleSpan(Typeface.BOLD), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mTextViewPriceE5.setText(strE5);
+
+        final SpannableStringBuilder strE10 = new SpannableStringBuilder(String.format(this.getString(R.string.priceE10),
+                mStation.getPriceE10()));
+        strE10.setSpan(new StyleSpan(Typeface.BOLD), 0, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mTextViewPriceE10.setText(strE10);
+
+        final SpannableStringBuilder strDiesel = new SpannableStringBuilder(String.format(this.getString(R.string.priceDiesel),
+                mStation.getPriceDiesel()));
+        strDiesel.setSpan(new StyleSpan(Typeface.BOLD), 0, 6, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mTextViewPriceDiesel.setText(strDiesel);
     }
 
 }

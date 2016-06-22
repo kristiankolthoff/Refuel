@@ -52,4 +52,15 @@ public class RESTStatus {
     public void setStations(List<Station> stations) {
         this.stations = stations;
     }
+
+    @Override
+    public String toString() {
+        return "RESTStatus{" +
+                "status='" + status + '\'' +
+                ", ok='" + ok + '\'' +
+                ", license='" + license + '\'' +
+                ", data='" + data + '\'' +
+                ", stations=" + stations +
+                '}';
+    }
 }
