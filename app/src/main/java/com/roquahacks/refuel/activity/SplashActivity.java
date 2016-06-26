@@ -1,10 +1,13 @@
 package com.roquahacks.refuel.activity;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,21 +19,28 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.roquahacks.model.Station;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.roquahacks.model.station.Result;
 import com.roquahacks.refuel.Application;
 import com.roquahacks.refuel.R;
-import com.roquahacks.service.RESTFuelService;
-import com.roquahacks.service.ServiceCallback;
+import com.roquahacks.service.background.AlarmReceiver;
+import com.roquahacks.service.database.RefuelDBHelper;
+import com.roquahacks.service.rest.ApplicationCallback;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
-import rx.Subscription;
+import java.util.Calendar;
 
 public class SplashActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
@@ -38,6 +48,11 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     private TextView mTextViewLogo;
     private ProgressBar mProgressBar;
     private GoogleApiClient mGoogleApiClient;
+    private PendingIntent pendingIntent;
+    private AlarmManager alarmManager;
+    private Intent alarmIntent;
+
+    private final static boolean USE_LOCATION = true;
 
     public final static int BACKGROUND = Color.parseColor("#FF8E00");
 
@@ -45,7 +60,6 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
         mTextViewLogo = (TextView) findViewById(R.id.textView_logo);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
@@ -55,8 +69,27 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
         mProgressBar.getIndeterminateDrawable().setColorFilter(BACKGROUND, PorterDuff.Mode.MULTIPLY);
 
-        Application.setContext(this);
-        Application.initDefaultRESTConfig();
+//        Result result = new Result();
+//        result.setLat(49.4883333);
+//        result.setLng(8.4647222);
+//        result.setRadian(3);
+//        result.setMarksCurrentLocation(false);
+//        result.setBestRefuelTime("2016-06-23 15:02:00:000");
+//        result.setLastBestPriceE5(1.30);
+//        result.setLastBestPriceE10(1.34);
+////        result.setLastBestPriceDiesel(1.11);
+//        Calendar cal = Calendar.getInstance();
+//        int weekday = cal.get(Calendar.DAY_OF_WEEK);
+//        int time = (int) System.currentTimeMillis();
+//        RefuelDBHelper dbHelper = RefuelDBHelper.getInstance(this);
+//        dbHelper.clearTablePriceHistory();
+//        PriceHistoryEM priceHistoryEM = new PriceHistoryEM(weekday,"15",1.31,1.34,1.13, String.valueOf(time));
+//        dbHelper.insertPriceHistoryEvent(priceHistoryEM);
+//        PriceHistoryEM entry = dbHelper.obtainPriceHistoryEM();
+//        Log.d("Refuel", entry.toString());
+
+        alarmIntent = new Intent(this, AlarmReceiver.class);
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -64,6 +97,23 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
+        }
+    }
+
+    private void startAlarm() {
+        if(PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_NO_CREATE) == null) {
+            alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), AlarmReceiver.UPDATE_FREQ,
+                    PendingIntent.getBroadcast(this, 0, alarmIntent, 0));
+            Toast.makeText(this, "Alarm set", Toast.LENGTH_SHORT).show();
+            Log.d("Refuel", "alarm started");
+        } else {
+            Log.d("Refuel", "alarm already existing");
+        }
+    }
+
+    private void cancelAlarm() {
+        if(alarmManager != null) {
+            alarmManager.cancel(pendingIntent);
         }
     }
 
@@ -81,36 +131,95 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(30 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+
+        //**************************
+        builder.setAlwaysShow(true); //this is the key ingredient
+        //**************************
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                final LocationSettingsStates state = result.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        startApplication();
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(
+                                    SplashActivity.this, 1000);
+
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        Log.d("Refuel", "force close app");
+                        finish();
+                        break;
+                }
+            }
+        });
+    }
+
+    private void startApplication() {
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
         Log.d("Refuel", String.valueOf(mLastLocation.getLatitude()));
         Log.d("Refuel", String.valueOf(mLastLocation.getLongitude()));
-        //TODO harmful, backend service of geocoder may not be present
-        if(Geocoder.isPresent()) {
-            Geocoder geocoder = new Geocoder(this);
-            try {
-                List<Address> addresses = geocoder.getFromLocationName("68161", 1);
-                for(Address a : addresses) {
-                    Log.d("Refuel", a.toString());
-                    Log.d("Refuel", String.valueOf(a.getLatitude()));
-                    Log.d("Refuel", String.valueOf(a.getLongitude()));
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        //TODO think about attaching the parameters in fetchliststations call
-        Application.updateLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-        Application.fetchListStations(new ServiceCallback() {
+        Application.init(this, mLastLocation);
+        Application.fetchResults(new ApplicationCallback() {
             @Override
-            public void onFinished(ArrayList<Station> stations) {
+            public void onFinished(Result result) {
                 Intent intentMain = new Intent(SplashActivity.this, RefuelActivity.class);
-                intentMain.putParcelableArrayListExtra(Application.STATION_LIST_INTENT_ID, stations);
+                intentMain.putExtra(Application.INTENT_RES_RESULTS, result);
+                Log.d("Refuel", result.toString());
+                startAlarm();
                 SplashActivity.this.startActivity(intentMain);
             }
-        });
+        }, USE_LOCATION);
+
+//        //TODO harmful, backend service of geocoder may not be present
+//        if(Geocoder.isPresent()) {
+//            Geocoder geocoder = new Geocoder(this);
+//            try {
+//                List<Address> addresses = geocoder.getFromLocationName("68161", 1);
+//                for(Address a : addresses) {
+//                    Log.d("Refuel", a.toString());
+//                    Log.d("Refuel", String.valueOf(a.getLatitude()));
+//                    Log.d("Refuel", String.valueOf(a.getLongitude()));
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        //TODO think about attaching the parameters in fetchliststations call
+//        Application.updateLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+//        Application.fetchListStations(new ServiceCallback() {
+//            @Override
+//            public void onFinished(ArrayList<Station> stations) {
+//                Intent intentMain = new Intent(SplashActivity.this, RefuelActivity.class);
+//                intentMain.putParcelableArrayListExtra(Application.STATION_LIST_INTENT_ID, stations);
+//                SplashActivity.this.startActivity(intentMain);
+//            }
+//        });
     }
 
     @Override

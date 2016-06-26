@@ -1,4 +1,4 @@
-package com.roquahacks.model;
+package com.roquahacks.model.station;
 
 
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 import com.roquahacks.utils.LogoHolder;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -285,7 +286,9 @@ public class Station implements Parcelable, Comparable<Station> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, lat, lng, brand, dist, priceE5, priceE10, priceDiesel, id, isOpen, street, houseNumber, postCode, place);
+        return Objects.hash(name, lat, lng, brand,
+                dist, priceE5, priceE10, priceDiesel,
+                id, isOpen, street, houseNumber, postCode, place);
     }
 
     @Override
@@ -369,6 +372,12 @@ public class Station implements Parcelable, Comparable<Station> {
             return 1;
         } else {
             return 0;
+        }
+    }
+
+    public static void updateRanking(List<Station> stations) {
+        for (int i = 0; i < stations.size(); i++) {
+            stations.get(i).setRank(i);
         }
     }
 }

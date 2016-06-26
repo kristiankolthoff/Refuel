@@ -1,31 +1,22 @@
 package com.roquahacks.refuel.activity;
 
-import android.app.FragmentTransaction;
-import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.transition.Fade;
 import android.transition.Transition;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.MapFragment;
-import com.roquahacks.model.Station;
+import com.roquahacks.model.station.Station;
 import com.roquahacks.refuel.Application;
 import com.roquahacks.refuel.R;
 import com.squareup.picasso.Picasso;
-
-import org.w3c.dom.Text;
 
 public class StationDetailActivity extends AppCompatActivity {
 
@@ -52,7 +43,7 @@ public class StationDetailActivity extends AppCompatActivity {
         getWindow().setExitTransition(fade);
         getWindow().setEnterTransition(fade);
 
-        mStation = getIntent().getParcelableExtra(Application.STATION_INTENT_ID);
+        mStation = getIntent().getParcelableExtra(Application.INTENT_RES_STATION);
 
         mImageViewBackground = (ImageView) findViewById(R.id.imageView_background_detail);
         mTextViewBrand = (TextView) findViewById(R.id.textView_brand_detail);

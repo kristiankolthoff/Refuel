@@ -1,11 +1,14 @@
-package com.roquahacks.model;
+package com.roquahacks.model.rest;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
 
 /**
  * Created by Studio on 06.06.2016.
  */
-public class RESTConfiguration {
+public class RESTConfiguration implements Parcelable{
 
-    //TODO needs to be a singleton
     private double lat;
     private double lng;
     private int radian;
@@ -26,8 +29,27 @@ public class RESTConfiguration {
     }
 
     public RESTConfiguration() {
-
+        this.sortPolicy = SortPolicy.DISTANCE;
+        this.fuelType = FuelType.ALL;
     }
+
+    protected RESTConfiguration(Parcel in) {
+        lat = in.readDouble();
+        lng = in.readDouble();
+        radian = in.readInt();
+    }
+
+    public static final Creator<RESTConfiguration> CREATOR = new Creator<RESTConfiguration>() {
+        @Override
+        public RESTConfiguration createFromParcel(Parcel in) {
+            return new RESTConfiguration(in);
+        }
+
+        @Override
+        public RESTConfiguration[] newArray(int size) {
+            return new RESTConfiguration[size];
+        }
+    };
 
     public RESTConfiguration setLat(double lat) {
         this.lat = lat;
@@ -87,6 +109,18 @@ public class RESTConfiguration {
                 ", sortPolicy=" + sortPolicy +
                 ", fuelType=" + fuelType +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeDouble(lat);
+        parcel.writeDouble(lng);
+        parcel.writeInt(radian);
     }
 
     public static enum SortPolicy {

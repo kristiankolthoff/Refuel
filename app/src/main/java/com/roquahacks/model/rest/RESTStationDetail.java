@@ -1,17 +1,26 @@
-package com.roquahacks.model;
+package com.roquahacks.model.rest;
 
-import java.util.List;
+import com.roquahacks.model.station.StationDetail;
 
 /**
- * Created by Studio on 07.06.2016.
+ * Created by Studio on 14.06.2016.
  */
-public class RESTStatus {
+public class RESTStationDetail {
 
     private String status;
     private String ok;
     private String license;
     private String data;
-    private List<Station> stations;
+    private StationDetail station;
+
+    public RESTStationDetail(String status, String ok, String license,
+                             String data, StationDetail station) {
+        this.status = status;
+        this.ok = ok;
+        this.license = license;
+        this.data = data;
+        this.station = station;
+    }
 
     public String getStatus() {
         return status;
@@ -45,22 +54,11 @@ public class RESTStatus {
         this.data = data;
     }
 
-    public List<Station> getStations() {
-        return stations;
+    public StationDetail getStation() {
+        return station;
     }
 
-    public void setStations(List<Station> stations) {
-        this.stations = stations;
-    }
-
-    @Override
-    public String toString() {
-        return "RESTStatus{" +
-                "status='" + status + '\'' +
-                ", ok='" + ok + '\'' +
-                ", license='" + license + '\'' +
-                ", data='" + data + '\'' +
-                ", stations=" + stations +
-                '}';
+    public void setStation(StationDetail station) {
+        this.station = station;
     }
 }

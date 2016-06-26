@@ -1,13 +1,11 @@
 package com.roquahacks.refuel.activity;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -28,24 +26,19 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.roquahacks.model.RESTStatus;
-import com.roquahacks.model.Station;
-import com.roquahacks.model.RESTConfiguration;
-import com.roquahacks.refuel.Application;
 import com.roquahacks.refuel.R;
-import com.roquahacks.service.RESTFuelService;
+import com.roquahacks.model.station.Result;
+import com.roquahacks.model.station.Station;
+import com.roquahacks.model.rest.RESTConfiguration;
+import com.roquahacks.refuel.Application;
+import com.roquahacks.service.database.RefuelDBHelper;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Subscriber;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class RefuelActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks,
@@ -54,9 +47,10 @@ public class RefuelActivity extends AppCompatActivity
     private RESTConfiguration restConfig;
     private Button buttonCurrFuel;
     Button buttonBestTime;
-    ArrayList<Station> mStations;
+    Result mResult;
     private GoogleApiClient mGoogleApiClient;
     private Subscription subscription;
+    private ArrayList<Station> mMainStations;
 
     private ImageView imageViewBackground;
     private ImageView imageViewLogo;
@@ -84,7 +78,7 @@ public class RefuelActivity extends AppCompatActivity
         spannable.setSpan(new ForegroundColorSpan(SplashActivity.BACKGROUND), 0, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         setTitle(spannable);
 
-        mStations = getIntent().getParcelableArrayListExtra(Application.STATION_LIST_INTENT_ID);
+        mResult = getIntent().getParcelableExtra(Application.INTENT_RES_RESULTS);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -108,12 +102,12 @@ public class RefuelActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
-        Station s = mStations.get(0);
+        //Depends on sorting criterion
+        Station s = mResult.getStations().get(0);
+        mMainStations = mResult.getStations();
 
         imageViewBackground = (ImageView) findViewById(R.id.imageView_main_background);
         imageViewLogo = (ImageView) findViewById(R.id.imageView_main_logo);
@@ -146,9 +140,10 @@ public class RefuelActivity extends AppCompatActivity
         mButtonNavigation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Station s = mStations.get(0);
+                Station s = mMainStations.get(0);
                 Intent navigationIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://maps.google.com/maps?saddr=48.56,8.7&daddr="+s.getLat()+","+s.getLng()));
+                        Uri.parse("http://maps.google.com/maps?saddr=" + Application.getCurrLat() + "," +
+                                Application.getCurrLng() + "&daddr="+s.getLat()+","+s.getLng()));
                 startActivity(navigationIntent);
             }
         });
@@ -156,9 +151,9 @@ public class RefuelActivity extends AppCompatActivity
         mButtonRanking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(mStations != null) {
+                if(mMainStations != null) {
                     Intent intent = new Intent(RefuelActivity.this, StationListActivity.class);
-                    intent.putParcelableArrayListExtra(Application.STATION_LIST_INTENT_ID, mStations);
+                    intent.putParcelableArrayListExtra(Application.INTENT_RES_STATION_LIST, mMainStations);
                     RefuelActivity.this.startActivity(intent);
                 }
             }
@@ -172,6 +167,23 @@ public class RefuelActivity extends AppCompatActivity
                     .addApi(LocationServices.API)
                     .build();
         }
+        this.startCountAnimation(s.getPriceE5(), mTextViewPriceE5);
+        this.startCountAnimation(s.getPriceE10(), mTextViewPriceE10);
+        this.startCountAnimation(s.getPriceDiesel(), mTextViewPriceDiesel);
+    }
+
+    private void startCountAnimation(double value, final TextView textView) {
+        ValueAnimator animator = new ValueAnimator();
+        int max = Integer.valueOf(String.valueOf(value).replace(".", "").substring(0,3));
+        animator.setFloatValues(0, (float) value);
+        animator.setDuration(2000);
+        final DecimalFormat df = new DecimalFormat("#.##");
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            public void onAnimationUpdate(ValueAnimator animation) {
+                textView.setText(df.format(animation.getAnimatedValue()));
+            }
+        });
+        animator.start();
     }
 
 
@@ -246,58 +258,14 @@ public class RefuelActivity extends AppCompatActivity
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-//        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-//                mGoogleApiClient);
-//        Log.d("Refuel", "onConnected");
-//        if (mLastLocation != null) {
-//            double lat = mLastLocation.getLatitude();
-//            double lng = mLastLocation.getLongitude();
-//            Log.d("Refuel", String.valueOf(lat));
-//            Log.d("Refuel", String.valueOf(lng));
-//            final int RADIAN = 5;
-//            final RESTConfiguration.FuelType FUEL_TYPE = RESTConfiguration.FuelType.ALL;
-//            final RESTConfiguration.SortPolicy SORT_POLICY = RESTConfiguration.SortPolicy.DISTANCE;
-//            RESTConfiguration restConfig = new RESTConfiguration()
-//                    .setLat(lat)
-//                    .setLng(lng)
-//                    .setRadian(RADIAN)
-//                    .setFuelType(FUEL_TYPE)
-//                    .setSortPolicy(SORT_POLICY);
-//            RESTFuelService fuelService = null;
-//            try {
-//                fuelService = new RESTFuelService.Factory()
-//                        .setCaInput(getAssets().open("tanker-cert.cer"))
-//                        .build();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            subscription = fuelService.fetchListStations(restConfig.getLat(),
-//                    restConfig.getLng(), restConfig.getRadian(), restConfig.getSortPolicy(),
-//                    restConfig.getFuelType(), RESTConfiguration.API_KEY)
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeOn(Schedulers.io())
-//                    .subscribe(new Subscriber<RESTStatus>() {
-//                        @Override
-//                        public void onCompleted() {
-//                            Log.d("Refuel", "Completed");
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//                            Log.d("Refuel", "Error during REST call");
-//                        }
-//
-//                        @Override
-//                        public void onNext(RESTStatus restStatus) {
-//                            List<Station> stations = restStatus.getStations();
-//                            for (int i = 0; i < stations.size(); i++) {
-//                                stations.get(i).setRank(i+1);
-//                                Log.d("Refuel", stations.get(i).toString());
-//                            }
-//                            mStations = toArrayList(stations);
-//                        }
-//                    });
-//        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("Refuel", "onDestroy - persist results");
+//        Application.persistResults();
     }
 
     @Override

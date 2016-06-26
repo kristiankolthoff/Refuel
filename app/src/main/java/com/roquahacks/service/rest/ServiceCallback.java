@@ -1,6 +1,6 @@
-package com.roquahacks.service;
+package com.roquahacks.service.rest;
 
-import com.roquahacks.model.Station;
+import com.roquahacks.model.station.Station;
 
 import java.util.ArrayList;
 

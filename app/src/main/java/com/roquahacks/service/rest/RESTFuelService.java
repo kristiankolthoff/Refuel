@@ -1,8 +1,8 @@
-package com.roquahacks.service;
+package com.roquahacks.service.rest;
 
-import com.roquahacks.model.RESTConfiguration;
-import com.roquahacks.model.RESTStationDetail;
-import com.roquahacks.model.RESTStatus;
+import com.roquahacks.model.rest.RESTConfiguration;
+import com.roquahacks.model.rest.RESTStationDetail;
+import com.roquahacks.model.rest.RESTStatus;
 
 import java.io.IOException;
 import java.io.InputStream;

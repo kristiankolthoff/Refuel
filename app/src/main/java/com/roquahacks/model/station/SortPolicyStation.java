@@ -1,4 +1,4 @@
-package com.roquahacks.model;
+package com.roquahacks.model.station;
 
 /**
  * Created by Studio on 15.06.2016.

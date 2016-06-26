@@ -1,4 +1,4 @@
-package com.roquahacks.model;
+package com.roquahacks.model.station;
 
 /**
  * Created by Studio on 14.06.2016.
@@ -6,7 +6,6 @@ package com.roquahacks.model;
 public class OpeningTime {
 
     private String text;
-    //TODO maybe include real time types
     private String start;
     private String end;
 

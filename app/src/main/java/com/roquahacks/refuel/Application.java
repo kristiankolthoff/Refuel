@@ -1,21 +1,26 @@
 package com.roquahacks.refuel;
 
-import android.app.Service;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.util.Log;
 
-import com.roquahacks.model.RESTConfiguration;
-import com.roquahacks.model.RESTStatus;
-import com.roquahacks.model.Station;
-import com.roquahacks.service.RESTFuelService;
-import com.roquahacks.service.ServiceCallback;
+import com.roquahacks.model.rest.RESTConfiguration;
+import com.roquahacks.model.rest.RESTStatus;
+import com.roquahacks.model.station.Result;
+import com.roquahacks.model.station.Station;
+import com.roquahacks.service.database.RefuelDBContract;
+import com.roquahacks.service.database.RefuelDBHelper;
+import com.roquahacks.service.rest.ApplicationCallback;
+import com.roquahacks.service.rest.RESTFuelService;
+import com.roquahacks.service.rest.ServiceCallback;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -28,15 +33,67 @@ public class Application {
 
     private static Context mContext;
     private static RESTFuelService mRestService;
-    private static RESTConfiguration mRestConfig;
-    private static ArrayList<Station> mStations;
+    private static RefuelDBHelper mDbHelper;
+    private static Location mLocation;
+    private static Result result;
 
-    public static String STATION_LIST_INTENT_ID = "stations";
-    public static String STATION_INTENT_ID = "station";
+    public static String INTENT_RES_STATION_LIST = "stations";
+    public static String INTENT_RES_STATION = "station";
+    public static String INTENT_RES_RESULTS = "results";
 
-    public static void fetchListStations(final ServiceCallback callback) {
-        Subscription subscription = getRestService().fetchListStations(mRestConfig.getLat(), mRestConfig.getLng(),
-                mRestConfig.getRadian(), mRestConfig.getSortPolicy(), mRestConfig.getFuelType(), RESTConfiguration.API_KEY)
+
+    public static void init(Context context) {
+        mContext = context.getApplicationContext();
+        mDbHelper = RefuelDBHelper.getInstance(context);
+    }
+
+    public static void init(Context context, Location location) {
+        mContext = context.getApplicationContext();
+        mDbHelper = RefuelDBHelper.getInstance(context);
+        mLocation = location;
+    }
+
+    public static void fetchResults(final ApplicationCallback appCallback, boolean useLocation) {
+        result = mDbHelper.obtainResult();
+        if(result == null) {
+            Log.d("Refuel", "No entry found");
+            Result r = defaultResult();
+            mDbHelper.insertResult(r);
+            fetchListStations(r, useLocation, appCallback);
+        } else {
+            fetchListStations(result, useLocation, appCallback);
+        }
+    }
+
+    private static Result defaultResult() {
+        final int DEFAULT_RADIAN = 5;
+        Result result = new Result();
+        result.setLat(mLocation.getLatitude());
+        result.setLng(mLocation.getLongitude());
+        result.setRadian(DEFAULT_RADIAN);
+        result.setMarksCurrentLocation(true);
+        return result;
+    }
+
+    public static void persistResult() {
+        result.updateBestPriceE5();
+        result.updateBestPriceE10();
+        result.updateBestPriceDiesel();
+        Log.d("Refuel", "price E10" + String.valueOf(result.getLastBestPriceE5()));
+        mDbHelper.updateResult(result);
+    }
+
+
+    private static void fetchListStations(final Result result, boolean useLocation,
+                                         final ApplicationCallback appCallback) {
+        if(result.marksCurrentLocation() && useLocation) {
+            result.getRestConfig().setLat(mLocation.getLatitude());
+            result.getRestConfig().setLng(mLocation.getLongitude());
+        }
+        final RESTConfiguration restConfig = result.getRestConfig();
+        Log.d("Refuel", restConfig.toString());
+        Subscription subscription = getRestService().fetchListStations(restConfig.getLat(), restConfig.getLng(),
+                restConfig.getRadian(), restConfig.getSortPolicy(), restConfig.getFuelType(), RESTConfiguration.API_KEY)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Subscriber<RESTStatus>() {
@@ -46,6 +103,7 @@ public class Application {
 
                     @Override
                     public void onError(Throwable e) {
+                        Log.d("Refuel", e.getMessage());
                         Log.d("Refuel", "Error during REST call");
                     }
 
@@ -54,28 +112,17 @@ public class Application {
                         List<Station> stations = restStatus.getStations();
                         Log.d("Refuel", String.valueOf(stations.size()));
                         Log.d("Refuel", restStatus.toString());
-                        Log.d("Refuel", mRestConfig.toString());
+                        Log.d("Refuel", restConfig.toString());
                         for (int i = 0; i < stations.size(); i++) {
                             stations.get(i).setRank(i+1);
                             Log.d("Refuel", stations.get(i).toString());
                         }
-                        mStations = toArrayList(stations);
-                        callback.onFinished(mStations);
+                        result.setStations(toArrayList(stations));
+                        appCallback.onFinished(result);
                     }
                 });
     }
 
-    public static void initDefaultRESTConfig() {
-        final int RADIAN = 5;
-        final RESTConfiguration.FuelType FUEL_TYPE = RESTConfiguration.FuelType.ALL;
-        final RESTConfiguration.SortPolicy SORT_POLICY = RESTConfiguration.SortPolicy.DISTANCE;
-        mRestConfig = new RESTConfiguration()
-                .setLat(48.5)
-                .setLng(8.62)
-                .setRadian(RADIAN)
-                .setFuelType(FUEL_TYPE)
-                .setSortPolicy(SORT_POLICY);
-    }
 
     private static RESTFuelService getRestService() {
         if(mRestService == null) {
@@ -90,32 +137,8 @@ public class Application {
         return mRestService;
     }
 
-    private static RESTConfiguration getRestConfig() {
-        if(mRestConfig == null) {
-            initDefaultRESTConfig();
-        }
-        return mRestConfig;
-    }
-
     private static Context getContext() {
         return mContext;
-    }
-
-    public static void setContext(Context mContext) {
-        Application.mContext = mContext;
-    }
-
-    public void setRestConfig(RESTConfiguration restConfig) {
-        mRestConfig = restConfig;
-    }
-
-    public static void updateLocation(double lat, double lng) {
-        mRestConfig.setLat(lat);
-        mRestConfig.setLng(lng);
-    }
-
-    public static void updateRadius(int radius) {
-        mRestConfig.setRadian(radius);
     }
 
     public static <T> ArrayList<T> toArrayList(List<T> list) {
@@ -126,5 +149,23 @@ public class Application {
         return convertedList;
     }
 
+    public static RefuelDBHelper getmDbHelper() {
+        return mDbHelper;
+    }
 
+    public static Location getCurrLocation() {
+        return mLocation;
+    }
+
+    public static void setCurrLocation(Location currLocation) {
+        Application.mLocation = currLocation;
+    }
+
+    public static double getCurrLat() {
+        return mLocation.getLatitude();
+    }
+
+    public static double getCurrLng() {
+        return mLocation.getLongitude();
+    }
 }

@@ -2,8 +2,8 @@ package com.roquahacks.refuel;
 
 import android.content.res.AssetManager;
 
-import com.roquahacks.model.RESTConfiguration;
-import com.roquahacks.service.RESTFuelService;
+import com.roquahacks.model.rest.RESTConfiguration;
+import com.roquahacks.service.rest.RESTFuelService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,9 +15,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.

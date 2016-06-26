@@ -1,4 +1,4 @@
-package com.roquahacks.model;
+package com.roquahacks.model.station;
 
 import android.os.Parcel;
 import android.os.Parcelable;
