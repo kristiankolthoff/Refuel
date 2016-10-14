@@ -32,6 +32,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.roquahacks.model.station.PriceHistoryEM;
 import com.roquahacks.model.station.Result;
 import com.roquahacks.refuel.Application;
 import com.roquahacks.refuel.R;
@@ -41,6 +42,7 @@ import com.roquahacks.service.rest.ApplicationCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class SplashActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
@@ -69,24 +71,11 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
 
         mProgressBar.getIndeterminateDrawable().setColorFilter(BACKGROUND, PorterDuff.Mode.MULTIPLY);
 
-//        Result result = new Result();
-//        result.setLat(49.4883333);
-//        result.setLng(8.4647222);
-//        result.setRadian(3);
-//        result.setMarksCurrentLocation(false);
-//        result.setBestRefuelTime("2016-06-23 15:02:00:000");
-//        result.setLastBestPriceE5(1.30);
-//        result.setLastBestPriceE10(1.34);
-////        result.setLastBestPriceDiesel(1.11);
-//        Calendar cal = Calendar.getInstance();
-//        int weekday = cal.get(Calendar.DAY_OF_WEEK);
-//        int time = (int) System.currentTimeMillis();
-//        RefuelDBHelper dbHelper = RefuelDBHelper.getInstance(this);
-//        dbHelper.clearTablePriceHistory();
-//        PriceHistoryEM priceHistoryEM = new PriceHistoryEM(weekday,"15",1.31,1.34,1.13, String.valueOf(time));
-//        dbHelper.insertPriceHistoryEvent(priceHistoryEM);
-//        PriceHistoryEM entry = dbHelper.obtainPriceHistoryEM();
-//        Log.d("Refuel", entry.toString());
+        RefuelDBHelper dbHelper = RefuelDBHelper.getInstance(this);
+        List<PriceHistoryEM> entries = dbHelper.obtainPriceHistoryEM();
+        for(PriceHistoryEM entry : entries) {
+            Log.d("Refuel", entry.toString());
+        }
 
         alarmIntent = new Intent(this, AlarmReceiver.class);
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

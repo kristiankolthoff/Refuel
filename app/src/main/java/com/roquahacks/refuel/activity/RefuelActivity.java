@@ -2,6 +2,7 @@ package com.roquahacks.refuel.activity;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -26,6 +27,9 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.hookedonplay.decoviewlib.DecoView;
+import com.hookedonplay.decoviewlib.charts.SeriesItem;
+import com.hookedonplay.decoviewlib.events.DecoEvent;
 import com.roquahacks.refuel.R;
 import com.roquahacks.model.station.Result;
 import com.roquahacks.model.station.Station;
@@ -55,17 +59,13 @@ public class RefuelActivity extends AppCompatActivity
     private ImageView imageViewBackground;
     private ImageView imageViewLogo;
     private TextView mTextViewMainLocation;
-    private TextView mTextViewPriceE5;
-    private TextView mTextViewChangeE5;
-    private TextView mTextViewPriceE10;
-    private TextView mTextViewChangeE10;
-    private TextView mTextViewPriceDiesel;
-    private TextView mTextViewChangeDiesel;
-    private TextView mTextViewTime;
+    private TextView mTextViewPercentage;
 
     private Button mButtonNavigation;
     private Button mButtonRanking;
     private Button mButtonRefuel;
+
+    private DecoView arcViewPriceE5;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -119,22 +119,46 @@ public class RefuelActivity extends AppCompatActivity
                 .noFade()
                 .into(imageViewLogo);
         mTextViewMainLocation = (TextView) findViewById(R.id.textView_main_location);
-        mTextViewPriceE5 = (TextView) findViewById(R.id.textView_main_priceE5);
-        mTextViewChangeE5 = (TextView) findViewById(R.id.textView_main_changeE5);
-        mTextViewPriceE10 = (TextView) findViewById(R.id.textView_main_priceE10);
-        mTextViewChangeE10 = (TextView) findViewById(R.id.textView_main_changeE10);
-        mTextViewPriceDiesel = (TextView) findViewById(R.id.textView_main_priceDiesel);
-        mTextViewChangeDiesel = (TextView) findViewById(R.id.textView_main_changeDiesel);
-        mTextViewTime = (TextView) findViewById(R.id.textView_main_time);
+        mTextViewPercentage = (TextView) findViewById(R.id.textPercentage);
+        arcViewPriceE5 = (DecoView) findViewById(R.id.arcView_priceE5);
+
+
+        arcViewPriceE5.addSeries(new SeriesItem.Builder(Color.argb(255,218,218,218))
+                .setRange(0, 100, 100)
+                .setLineWidth(40f)
+                .setSpinDuration(5000)
+                .setInitialVisibility(false)
+                .build());
+
+        SeriesItem series1 = new SeriesItem.Builder(Color.argb(255, 64, 196, 0))
+                .setRange(0,1.50f,0)
+                .setLineWidth(32f)
+                .setInitialVisibility(false)
+                .build();
+
+        final DecimalFormat df = new DecimalFormat("#.##");
+        series1.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
+            @Override
+            public void onSeriesItemAnimationProgress(float v, float v1) {
+                mTextViewPercentage.setText(df.format(v1));
+            }
+
+            @Override
+            public void onSeriesItemDisplayProgress(float v) {
+
+            }
+        });
+
+        int indexSeries1 = arcViewPriceE5.addSeries(series1);
+
+        arcViewPriceE5.addEvent(new DecoEvent.Builder(DecoEvent.EventType.EVENT_SHOW, true)
+                                .setDelay(1000)
+                                .setDuration(2000)
+                                .build());
+
+        arcViewPriceE5.addEvent(new DecoEvent.Builder(1.35f).setIndex(indexSeries1).setDelay(4000).build());
 
         mTextViewMainLocation.setText(String.format(getString(R.string.current_location), s.getPlace(), s.getDist()));
-        mTextViewPriceE5.setText(String.format(getString(R.string.price_plain), s.getPriceE5Beautified()));
-        mTextViewChangeE5.setText(String.format(getString(R.string.price_change), "2,35"));
-        mTextViewPriceE10.setText(String.format(getString(R.string.price_plain), s.getPriceE10Beautified()));
-        mTextViewChangeE10.setText(String.format(getString(R.string.price_change), "1,53"));
-        mTextViewPriceDiesel.setText(String.format(getString(R.string.price_plain), s.getPriceDieselBeautified()));
-        mTextViewChangeDiesel.setText(String.format(getString(R.string.price_change), "5,53"));
-        mTextViewTime.setText(String.format(getString(R.string.time), "9.30", 52));
 
         mButtonNavigation = (Button) findViewById(R.id.button_navigation);
         mButtonNavigation.setOnClickListener(new View.OnClickListener() {
@@ -167,23 +191,6 @@ public class RefuelActivity extends AppCompatActivity
                     .addApi(LocationServices.API)
                     .build();
         }
-        this.startCountAnimation(s.getPriceE5(), mTextViewPriceE5);
-        this.startCountAnimation(s.getPriceE10(), mTextViewPriceE10);
-        this.startCountAnimation(s.getPriceDiesel(), mTextViewPriceDiesel);
-    }
-
-    private void startCountAnimation(double value, final TextView textView) {
-        ValueAnimator animator = new ValueAnimator();
-        int max = Integer.valueOf(String.valueOf(value).replace(".", "").substring(0,3));
-        animator.setFloatValues(0, (float) value);
-        animator.setDuration(2000);
-        final DecimalFormat df = new DecimalFormat("#.##");
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            public void onAnimationUpdate(ValueAnimator animation) {
-                textView.setText(df.format(animation.getAnimatedValue()));
-            }
-        });
-        animator.start();
     }
 
 

@@ -17,7 +17,7 @@ public class RESTConfiguration implements Parcelable{
 
     private static int MAX_RADIAN = 25;
     private static int MIN_RADIAN = 1;
-    public static String API_KEY = "xxxx";
+    public static String API_KEY = "a7a9d59e-f515-05f0-3ca0-b2e3ed9b6412";
     public static String BASE_URL = "https://creativecommons.tankerkoenig.de/";
 
     public RESTConfiguration(FuelType fuelType, double lat, double lng, int radian, SortPolicy sortPolicy) {

@@ -16,6 +16,7 @@ import java.util.List;
 
 import static com.roquahacks.service.database.RefuelDBContract.ResultEntry;
 import static com.roquahacks.service.database.RefuelDBContract.PriceHistoryEntry;
+import static com.roquahacks.model.rest.RESTConfiguration.FuelType;
 
 /**
  * Created by Kolti on 23.06.2016.
@@ -23,6 +24,8 @@ import static com.roquahacks.service.database.RefuelDBContract.PriceHistoryEntry
 public class RefuelDBHelper extends SQLiteOpenHelper{
 
     private static RefuelDBHelper dbHelper;
+
+    private static final int DEFAULT_TIME = 15;
 
     private static final String TYPE_TEXT = " TEXT";
     private static final String TYPE_REAL = " REAL";
@@ -159,18 +162,58 @@ public class RefuelDBHelper extends SQLiteOpenHelper{
         return db.insert(PriceHistoryEntry.TABLE_NAME, null, vals);
     }
 
-    public PriceHistoryEM obtainPriceHistoryEM() {
+    public List<PriceHistoryEM> obtainPriceHistoryEM() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.query(false, PriceHistoryEntry.TABLE_NAME, null, null, null, null, null, null, null);
         Log.d("Refuel", "Num of priceentries:" + c.getCount());
-        c.moveToNext();
-        int weekday = c.getInt(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_WEEKDAY));
-        String time = c.getString(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_MEASURE_TIME));
-        double avgE5 = c.getDouble(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_AVG_E5));
-        double avgE10 = c.getDouble(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_AVG_E10));
-        double avgDiesel = c.getDouble(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_AVG_DIESEL));
-        String timestamp = c.getString(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_TIMESTAMP));
+        List<PriceHistoryEM> historyEMs = new ArrayList<>();
+        while(c.moveToNext()) {
+            int weekday = c.getInt(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_WEEKDAY));
+            String time = c.getString(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_MEASURE_TIME));
+            double avgE5 = c.getDouble(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_AVG_E5));
+            double avgE10 = c.getDouble(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_AVG_E10));
+            double avgDiesel = c.getDouble(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_AVG_DIESEL));
+            String timestamp = c.getString(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_TIMESTAMP));
+            historyEMs.add(new PriceHistoryEM(weekday, time, avgE5, avgE10, avgDiesel, timestamp));
+        }
         c.close();
-        return new PriceHistoryEM(weekday, time, avgE5, avgE10, avgDiesel, timestamp);
+        return historyEMs;
     }
+
+    public int getBestRefuelHour(int weekday, FuelType fuelType) {
+        if(fuelType == FuelType.ALL) {
+            return 0;
+        } else {
+            SQLiteDatabase db = this.getReadableDatabase();
+            String fuelTypeAvg = null;
+            if(fuelType == FuelType.E5) {
+                fuelTypeAvg = PriceHistoryEntry.COLUMN_NAME_AVG_E5;
+            } else if(fuelType == FuelType.E10) {
+                fuelTypeAvg = PriceHistoryEntry.COLUMN_NAME_AVG_E10;
+            } else {
+                fuelTypeAvg = PriceHistoryEntry.COLUMN_NAME_AVG_DIESEL;
+            }
+            final String EXTRACT_TIME =
+                    "SELECT " + PriceHistoryEntry.COLUMN_NAME_MEASURE_TIME + " AVG(" + fuelTypeAvg + ") as price" +
+                    " FROM " + PriceHistoryEntry.TABLE_NAME +
+                    " WHERE weekday = ?s " +
+                    " GROUP BY " + PriceHistoryEntry.COLUMN_NAME_MEASURE_TIME + ", " + fuelTypeAvg;
+            Cursor c = db.rawQuery(EXTRACT_TIME, new String[] {String.valueOf(weekday)});
+            double minValue = Double.MAX_VALUE;
+            String minTime = null;
+            while(c.moveToNext()) {
+                double currVal = c.getDouble(c.getColumnIndex("price"));
+                if(currVal < minValue) {
+                    minTime = c.getString(c.getColumnIndex(PriceHistoryEntry.COLUMN_NAME_MEASURE_TIME));
+                    minValue = currVal;
+                }
+            }
+            if(minTime == null){
+                return DEFAULT_TIME;
+            }
+            return Integer.valueOf(minTime);
+        }
+    }
+
+
 }

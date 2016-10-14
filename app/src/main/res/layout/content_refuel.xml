@@ -128,147 +128,42 @@
             android:textColor="@android:color/black"
             android:text="@string/current_location"/>
 
-            <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_donut"/>
-
-            <TextView
-            android:id="@+id/textView_main_priceE5"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/black"
-            android:text="@string/price_plain"/>
-
-            <ImageView
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_arrow_down"/>
-
-            <TextView
-            android:id="@+id/textView_main_changeE5"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/black"
-            android:text="@string/price_change"/>
-
-            </LinearLayout>
-
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content">
 
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_donut"/>
-
-                    <TextView
-                        android:id="@+id/textView_main_priceE10"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:paddingLeft="10dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/black"
-                        android:text="@string/price_plain"/>
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/ic_arrow_down"/>
-
-                    <TextView
-                        android:id="@+id/textView_main_changeE10"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:paddingLeft="10dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/black"
-                        android:text="@string/price_change"/>
-
-                </LinearLayout>
-
-                <LinearLayout
+                <com.hookedonplay.decoviewlib.DecoView
+                    xmlns:custom="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_donut"/>
+                    android:layout_height="match_parent"
+                    android:id="@+id/arcView_priceE5"
+                    custom:dv_arc_gravity_horizontal="Fill"
+                    custom:dv_arc_gravity_vertical="Bottom"
+                    android:layout_margin="8dp"/>
 
                     <TextView
-                        android:id="@+id/textView_main_priceDiesel"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:paddingLeft="10dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/black"
-                        android:text="@string/price_plain"/>
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/ic_arrow_down"/>
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text=""
+                        android:textSize="40sp"
+                        android:id="@+id/textPercentage"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+                        />
 
                     <TextView
-                        android:id="@+id/textView_main_changeDiesel"
                         android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:paddingLeft="10dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/black"
-                        android:text="@string/price_change"/>
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:text=""
+                        android:id="@+id/textRemaining"
+                        android:layout_below="@+id/textPercentage"
+                        android:layout_centerHorizontal="true"
+                        android:maxWidth="200dp" />
 
-                </LinearLayout>
+                </RelativeLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:src="@drawable/ic_time"/>
-
-                    <TextView
-                        android:id="@+id/textView_main_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:paddingLeft="10dp"
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:textColor="@android:color/black"
-                        android:text="@string/time"/>
-
-
-                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
